@@ -8,7 +8,7 @@ import {
 } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyACHkpcF_2YlRlWAqJuQ2NOm3RazDVKBnM",
+  apiKey: process.env.FIREBASE_API_KEY,
   authDomain: "mern-blog-bef62.firebaseapp.com",
   projectId: "mern-blog-bef62",
   storageBucket: "mern-blog-bef62.appspot.com",
