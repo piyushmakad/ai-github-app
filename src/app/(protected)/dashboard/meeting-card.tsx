@@ -93,7 +93,7 @@ const MeetingCard = () => {
             })}
           />
           <p className="text-center text-sm text-gray-500">
-            Uploading your meeting...
+            Uploading your meeting....
           </p>
         </div>
       )}
