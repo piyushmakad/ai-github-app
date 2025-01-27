@@ -39,7 +39,7 @@ export const getCommitHashes = async (
     commitMessage: commit.commit.message ?? "",
     commitAuthorName: commit.commit?.author?.name ?? "",
     commitAuthorAvatar: commit?.author?.avatar_url ?? "",
-    commitDate: commit.commit.author.date ?? "",
+    commitDate: commit.commit?.author?.date ?? "",
   }));
 };
 
@@ -63,7 +63,8 @@ export const pollCommits = async (projectId: string) => {
     }
     return " ";
   });
-
+ 
+  console.log(summaries)
   const commits = await db.commit.createMany({
     data: summaries.map((summary, index) => {
       console.log(`processing commits ${index}`);

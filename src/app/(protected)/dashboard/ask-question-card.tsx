@@ -17,6 +17,7 @@ import MDEditor from "@uiw/react-md-editor";
 import { CodeReferences } from "./code-references";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
+import useRefetch from "@/hooks/use-refetch";
 
 const AskQuestionCard = () => {
   const { project } = useProject();
@@ -49,45 +50,49 @@ const AskQuestionCard = () => {
     }
     setLoading(false);
   };
+
+  const refetch = useRefetch();
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[80vw] m-5">
+        <DialogContent className="overflow-y-auto sm:max-h-[90vh] sm:max-w-[80vw]">
           <DialogHeader>
             <div className="flex items-center gap-2">
               <DialogTitle>
                 <Image src="/logo.png" alt="autogitai" width={40} height={40} />
                 Ask a question!
+                <Button
+                  disabled={saveAnswer.isPending}
+                  onClick={() => {
+                    saveAnswer.mutate(
+                      {
+                        projectId: project!.id,
+                        question,
+                        answer,
+                        filesReferences,
+                      },
+                      {
+                        onSuccess: () => {
+                          toast.success("Answer Saved");
+                          refetch();
+                        },
+                        onError: () => {
+                          toast.error("Failed to save answer!");
+                        },
+                      },
+                    );
+                  }}
+                  variant={"outline"}
+                  className="ml-4 bg-blue-500 text-white border border-blue-600 hover:bg-blue-600 focus:ring focus:ring-blue-300 disabled:bg-blue-300 disabled:cursor-not-allowed"
+                >
+                  Save Answer
+                </Button>
               </DialogTitle>
-              <Button
-                disabled={saveAnswer.isPending}
-                onClick={() => {
-                  saveAnswer.mutate(
-                    {
-                      projectId: project!.id,
-                      question,
-                      answer,
-                      filesReferences,
-                    },
-                    {
-                      onSuccess: () => {
-                        toast.success("Answer Saved");
-                      },
-                      onError: () => {
-                        toast.error("Failed to save answer!");
-                      },
-                    },
-                  );
-                }}
-                variant={"outline"}
-              >
-                Save Answer
-              </Button>
             </div>
           </DialogHeader>
           <MDEditor.Markdown
             source={answer}
-            className="!h-full max-h-[40vh] max-w-[70vw] overflow-scroll"
+            className="!h-full max-h-[40vh] max-w-[70vw] overflow-scroll-y"
           />
           <div className="h-4"></div>
           <CodeReferences filesReferences={filesReferences} />

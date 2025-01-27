@@ -24,8 +24,8 @@ model User {
     email   String @unique
     credits Int    @default(150)
 
-    userToProjects      UserToProject[]
-    questionAsked       Question[]
+    userToProjects UserToProject[]
+    questionAsked  Question[]
 }
 
 model Project {
@@ -43,6 +43,7 @@ model Project {
     SourceCodeEmbedding SourceCodeEmbedding[]
 
     savedQuestions Question[]
+    Meeting        Meeting[]
 }
 
 model UserToProject {
@@ -103,4 +104,39 @@ model Question {
 
     userId String
     user   User   @relation(fields: [userId], references: [id])
+}
+
+model Meeting {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now())
+    name      String
+
+    meetingUrl String //from firebase
+
+    projectId String
+    project   Project @relation(fields: [projectId], references: [id])
+
+    status MeetingStatus @default(PROCESSING)
+    Issues Issues[]
+}
+
+model Issues {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now())
+
+    start    String
+    end      String
+    gist     String
+    headline String
+    summary  String
+
+    meetingId String
+    meeting   Meeting @relation(fields: [meetingId], references: [id])
+}
+
+enum MeetingStatus {
+    PROCESSING
+    COMPLETED
 }

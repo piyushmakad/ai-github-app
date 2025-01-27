@@ -55,7 +55,6 @@ export async function askQuestion(question: string, projectId: string) {
     });
 
     for await (const delta of textStream) {
-      console.log(delta);
       stream.update(delta); // Process each delta from the textStream
     }
     stream.done(); // Mark the stream as completed
