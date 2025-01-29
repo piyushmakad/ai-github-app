@@ -48,11 +48,11 @@ export async function askQuestion(question: string, projectId: string) {
   END OF QUESTION
   
   AI assistant will take into account any CONTEXT BLOCK that is provided in a conversation.
-  If the context does not provide the answer to the question, the You are an expert AI code assistant. Answer the following question based on the provided context. If the answer is not present in the context, guide the user to add the missing information.
-...
-
-  `,
-    });
+  If the context does not provide the answer to the question, then AI assistant will say, "I'm sorry, but I don't know the answer.
+  AI assistant will not apologize for previous responses, but instead it will say new information was gained.
+  AI assistant will not invent anything that is not drawn directly from the context.
+  Answer in markdown syntax with code snippets mostly. Be as detailed as possible when answering, make sure there is no error
+  `});
 
     for await (const delta of textStream) {
       stream.update(delta); // Process each delta from the textStream
