@@ -6,12 +6,15 @@ import React from "react";
 import CommitLog from "./commit-log";
 import AskQuestionCard from "./ask-question-card";
 import MeetingCard from "./meeting-card";
+const ArchiveButton = dynamic(() => import("./archive-button"), { ssr: false });
+const InviteButton = dynamic(() => import("./invite-button"), { ssr: false });
+import TeamMember from "./team-member";
+import dynamic from "next/dynamic";
 
 const DashboardPage = () => {
   const { project } = useProject();
   return (
     <div>
-      {project?.id}
       <div className="flex flex-wrap items-center justify-between gap-y-4">
         {/* github link*/}
         <div className="w-fit rounded-md bg-primary px-4 py-3">
@@ -35,21 +38,21 @@ const DashboardPage = () => {
         <div className="h-4"></div>
 
         <div className="flex items-center gap-4">
-          Team Members
-          Meeting
-          Archive
+          <TeamMember />
+          <InviteButton />
+          <ArchiveButton />
         </div>
       </div>
 
       <div className="mt-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
-          <AskQuestionCard/>
-          <MeetingCard/>
+          <AskQuestionCard />
+          <MeetingCard />
         </div>
       </div>
 
       <div className="mt-8">
-        <CommitLog/>
+        <CommitLog />
       </div>
     </div>
   );

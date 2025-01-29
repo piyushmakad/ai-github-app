@@ -10,12 +10,24 @@ import { api } from "@/trpc/react";
 import useProject from "@/hooks/use-project";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 
 const MeetingCard = () => {
   const { project } = useProject();
+  const processMeeting = useMutation({
+    mutationFn: async (data: { meetingUrl: string; meetingId: string }) => {
+      const { meetingUrl, meetingId } = data;
+      const response = await axios.post("/api/process-meeting", {
+        meetingUrl,
+        meetingId,
+      });
+      return response.data;
+    },
+  });
   const [isUploading, setIsUploading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
-  const router = useRouter()
+  const router = useRouter();
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       "audio/*": [".mp3", ".wav", ".m4a"],
@@ -36,26 +48,33 @@ const MeetingCard = () => {
         file as File,
         setProgress,
       )) as string;
-    //   window.alert(donwloadUrl);
-      console.log("Uploading meeting...")
-      uploadMeeting.mutate({
-        projectId: project.id,
-        meetingUrl: donwloadUrl,
-        name: file?.name,
-      },{
-        onSuccess: () => {
+      //   window.alert(donwloadUrl);
+      uploadMeeting.mutate(
+        {
+          projectId: project.id,
+          meetingUrl: donwloadUrl,
+          name: file?.name,
+        },
+        {
+          onSuccess: (meeting) => {
             toast.success("Meeting upload successfully.");
-            router.push('/meetings')
+            router.push("/meetings");
+            processMeeting.mutateAsync({
+              meetingUrl: donwloadUrl,
+              meetingId: meeting.id,
+            });
           },
           onError: () => {
             toast.error("Failed to upload meeting!");
           },
-      });
+        },
+      );
       setIsUploading(false);
     },
   });
 
   const uploadMeeting = api.project.uploadMeeting.useMutation();
+
   return (
     <Card
       className="col-span-2 flex flex-col items-center justify-center p-10"

@@ -116,6 +116,7 @@ export const projectRouter = createTRPCRouter({
           status: "PROCESSING",
         },
       });
+      return meeting;
     }),
 
   getMeetings: protectedProcedure
@@ -128,6 +129,70 @@ export const projectRouter = createTRPCRouter({
         include: {
           Issues: true,
         },
+      });
+    }),
+
+  deleteMeeting: protectedProcedure
+    .input(z.object({ meetingId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.meeting.delete({
+        where: { id: input.meetingId },
+      });
+    }),
+
+  getMeetingById: protectedProcedure
+    .input(z.object({ meetingId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.meeting.findUnique({
+        where: {
+          id: input.meetingId,
+        },
+        include: {
+          Issues: true,
+        },
+      });
+    }),
+
+  archiveProject: protectedProcedure
+    .input(z.object({ projectId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.project.update({
+        where: { id: input.projectId },
+        data: {
+          deletedAt: new Date(),
+        },
+      });
+    }),
+
+  getTeamMembers: protectedProcedure
+    .input(z.object({ projectId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.userToProject.findMany({
+        where: { projectId: input.projectId },
+        include: {
+          user: true,
+        },
+      });
+    }),
+
+  deleteProject: protectedProcedure
+    .input(z.object({ projectId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.userToProject.deleteMany({
+        where: { projectId: input.projectId },
+      });
+      await ctx.db.question.deleteMany({
+        where: { projectId: input.projectId },
+      });
+      await ctx.db.meeting.deleteMany({
+        where: { projectId: input.projectId },
+      });
+      await ctx.db.commit.deleteMany({
+        where: { projectId: input.projectId },
+      });
+
+      return await ctx.db.project.delete({
+        where: { id: input.projectId },
       });
     }),
 });

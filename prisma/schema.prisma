@@ -55,7 +55,7 @@ model UserToProject {
     projectId String
 
     user    User    @relation(fields: [userId], references: [id])
-    project Project @relation(fields: [projectId], references: [id])
+    project Project @relation(fields: [projectId], references: [id],onDelete: Cascade)
 
     @@unique([userId, projectId])
 }
@@ -66,7 +66,7 @@ model Commit {
     updatedAt DateTime @default(now())
 
     projectId String
-    project   Project @relation(fields: [projectId], references: [id])
+    project   Project @relation(fields: [projectId], references: [id],onDelete: Cascade)
 
     commitMessage      String
     commitHash         String
@@ -86,7 +86,7 @@ model SourceCodeEmbedding {
     summary          String
 
     projectId String
-    project   Project @relation(fields: [projectId], references: [id])
+    project   Project @relation(fields: [projectId], references: [id],onDelete: Cascade)
 }
 
 model Question {
@@ -100,7 +100,7 @@ model Question {
     filesReferences Json?
 
     projectId String
-    project   Project @relation(fields: [projectId], references: [id])
+    project   Project @relation(fields: [projectId], references: [id],onDelete: Cascade)
 
     userId String
     user   User   @relation(fields: [userId], references: [id])
@@ -115,7 +115,7 @@ model Meeting {
     meetingUrl String //from firebase
 
     projectId String
-    project   Project @relation(fields: [projectId], references: [id])
+    project   Project @relation(fields: [projectId], references: [id],onDelete: Cascade)
 
     status MeetingStatus @default(PROCESSING)
     Issues Issues[]
@@ -133,7 +133,7 @@ model Issues {
     summary  String
 
     meetingId String
-    meeting   Meeting @relation(fields: [meetingId], references: [id])
+    meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 }
 
 enum MeetingStatus {

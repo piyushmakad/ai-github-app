@@ -14,17 +14,21 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import useProject from "@/hooks/use-project";
+import useRefetch from "@/hooks/use-refetch";
 import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
 import {
   Bot,
   CreditCard,
   LayoutDashboardIcon,
   Plus,
   Presentation,
+  Trash,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 
 export function AppSideBar() {
   const { open } = useSidebar();
@@ -45,13 +49,8 @@ export function AppSideBar() {
       url: "/meetings",
       icon: Presentation,
     },
-    {
-      title: "Billing",
-      url: "/billing",
-      icon: CreditCard,
-    },
   ];
-
+  const deleteProject = api.project.deleteProject.useMutation();
   // const projects = [
   //   {
   //     name: "Project 1",
@@ -65,6 +64,7 @@ export function AppSideBar() {
   // ];
 
   const pathname = usePathname();
+  const refetch = useRefetch();
   return (
     <Sidebar collapsible="icon" variant="floating">
       <SidebarHeader>
@@ -109,7 +109,7 @@ export function AppSideBar() {
             <SidebarMenu>
               {projects?.map((project) => {
                 return (
-                  <SidebarMenuItem key={project.name}>
+                  <SidebarMenuItem key={project.name} className="flex items-center justify-between">
                     <SidebarMenuButton asChild>
                       <div
                         onClick={() => {
@@ -129,6 +129,24 @@ export function AppSideBar() {
                         <span>{project.name}</span>
                       </div>
                     </SidebarMenuButton>
+                    <Button
+                      className="h-7 w-7 p-2"
+                      // variant="destructive"
+                      onClick={() =>
+                        deleteProject.mutate(
+                          { projectId: project.id },
+                          {
+                            onSuccess: () => {
+                              toast.success("Project deleted Successfully.");
+                              refetch();
+                            },
+                          },
+                        )
+                      }
+                      disabled={deleteProject.isPending}
+                    >
+                      <Trash className="size-5" />
+                    </Button>
                   </SidebarMenuItem>
                 );
               })}
